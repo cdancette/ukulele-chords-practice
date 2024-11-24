@@ -86,12 +86,19 @@ export default {
         this.toggleMetronome();
       }
     },
+    async releaseWakeLock() {
+      if (this.wakeLock) {
+        await this.wakeLock.release();
+        this.wakeLock = null;
+      }
+    },
   },
   mounted() {
     window.addEventListener('keydown', this.handleKeydown);
   },
   beforeUnmount() {
     window.removeEventListener('keydown', this.handleKeydown);
+    this.releaseWakeLock();
   },
 };
 </script>
