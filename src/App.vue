@@ -39,18 +39,20 @@ export default {
         bpm: 90,
         repeat: 4,
         showTab: true,
+        instrument: 'ukulele', // Add instrument property
+        tones: {
+          natural: true,
+          flat: false,
+        }, // Add tones property
       },
-      chords: [
-        'A', 'B', 'C', 'D', 'E', 'F', 'G',
-        'Am', 'Bm', 'Cm', 'Dm', 'Em', 'Fm', 'Gm',
-        'A7', 'B7', 'C7', 'D7', 'E7', 'F7', 'G7',
-        'Amaj7', 'Bmaj7', 'Cmaj7', 'Dmaj7', 'Emaj7', 'Fmaj7', 'Gmaj7',
-        'Am7', 'Bm7', 'Cm7', 'Dm7', 'Em7', 'Fm7', 'Gm7',
-        // 'A#', 'C#', 'D#', 'F#', 'G#', // Add more chords as needed
-      ], // Add more chords as needed
-      currentChord: 'A',
-      nextChord: 'Am',
-      beatCounter: 0, // Track beats to change chords
+      chords: {
+        natural: ['A', 'B', 'C', 'D', 'E', 'F', 'G'],
+        flat: ['Ab', 'Bb', 'Db', 'Eb', 'Gb'],
+        variations: ['major', 'minor', '7', 'maj7', 'm7'],
+      },
+      currentChord: { main: 'A', variation: 'major' },
+      nextChord: { main: 'A', variation: 'minor' },
+      beatCounter: 0,
     };
   },
   methods: {
@@ -66,17 +68,22 @@ export default {
     },
     updateNextChord() {
       const { major, minor, seventh, maj7, m7 } = this.config.include;
-      const filteredChords = this.chords.filter(chord => {
-        if (major && /^[A-G]$/.test(chord)) return true;
-        if (minor && /^[A-G]m$/.test(chord)) return true;
-        if (seventh && /^[A-G]7$/.test(chord)) return true;
-        if (maj7 && /^[A-G]maj7$/.test(chord)) return true;
-        if (m7 && /^[A-G]m7$/.test(chord)) return true;
-        return false;
-      });
+      const filteredVariations = [];
+      if (major) filteredVariations.push('major');
+      if (minor) filteredVariations.push('minor');
+      if (seventh) filteredVariations.push('7');
+      if (maj7) filteredVariations.push('maj7');
+      if (m7) filteredVariations.push('m7');
+
+      let mainChords = [];
+      if (this.config.tones.natural) mainChords = mainChords.concat(this.chords.natural);
+      if (this.config.tones.flat) mainChords = mainChords.concat(this.chords.flat);
+
+      const randomMainChord = mainChords[Math.floor(Math.random() * mainChords.length)];
+      const randomVariation = filteredVariations[Math.floor(Math.random() * filteredVariations.length)];
 
       this.currentChord = this.nextChord;
-      this.nextChord = filteredChords[Math.floor(Math.random() * filteredChords.length)];
+      this.nextChord = { main: randomMainChord, variation: randomVariation };
     },
     toggleMetronome() {
       this.$refs.metronome.toggleMetronome();

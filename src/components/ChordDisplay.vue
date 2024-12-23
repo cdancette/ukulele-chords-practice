@@ -6,13 +6,13 @@
       :style="{ backgroundColor: currentChordBackgroundColor }"
     >
       <h2>Current Chord</h2>
-      <h3 v-if="!showTab">{{ currentChord }}</h3>
-      <img v-else :src="getChordImageUrl(currentChord)" alt="Current Chord" />
+      <h3 >{{ getChordsName(currentChord) }}</h3>
+      <img v-if="showTab" :src="getChordImageUrl(currentChord)" alt="Current Chord" />
     </div>
     <div class="chord-box next-chord">
       <h2>Coming Next</h2>
-      <h3 v-if="!showTab">{{ nextChord }}</h3>
-      <img v-else :src="getChordImageUrl(nextChord)" alt="Next Chord" />
+      <h3 >{{getChordsName(nextChord) }}</h3>
+      <img v-if="showTab" :src="getChordImageUrl(nextChord)" alt="Next Chord" />
     </div>
   </div>
 </template>
@@ -21,11 +21,11 @@
 export default {
   props: {
     currentChord: {
-      type: String,
+      type: Object,
       required: true,
     },
     nextChord: {
-      type: String,
+      type: Object,
       required: true,
     },
     showTab: {
@@ -52,9 +52,17 @@ export default {
     },
   },
   methods: {
-    getChordImageUrl(chordName) {
-      return `https://ukutabs.com/chords/standard/${chordName}.svg`;
+    getChordImageUrl(chord) {
+      const instrument = this.$parent.config.instrument; // Get the instrument from the parent component
+      return `https://tombatossals.github.io/react-chords/media/${instrument}/chords/${chord.main}/${chord.variation}/1.svg`;
     },
+    getChordsName(chordObj) {
+      
+      const map = {"major": "", "minor": "m"}
+      const variationStr = map[chordObj.variation] || chordObj.variation;
+
+      return chordObj.variation === 'major' ? chordObj.main : `${chordObj.main}${variationStr}`;
+    }
   },
 };
 </script>
@@ -101,8 +109,13 @@ export default {
 }
 
 .chord-box img {
-  width: 100px;
+  width: 250px;
   height: auto;
-  margin-top: 10px;
+  margin-top: 0px;
+}
+.chord-box h3 {
+  margin-top: 2px;
+  margin-bottom: 2px;
+  padding: 0
 }
 </style>
